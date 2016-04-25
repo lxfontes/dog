@@ -1,0 +1,15 @@
+#!/bin/bash
+echo 'Starting Pump / Consumer for 1 minute with low request count'
+echo 'press enter to continue'
+read
+/go/bin/pump -wait=100 -run=1m | /go/bin/consumer
+
+echo 'Starting Pump / Consumer for 1 minute with high request count'
+echo 'press enter to continue'
+read
+/go/bin/pump -wait=10 -run=1m | /go/bin/consumer
+
+echo 'Starting Pump / Consumer for 5 minutes with highly variable request count'
+echo 'press enter to continue'
+read
+/go/bin/pump -wait=1000 -run=5m | /go/bin/consumer
