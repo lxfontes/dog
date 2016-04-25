@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -117,8 +118,11 @@ func (m *Monitor) PrintStats() {
 }
 
 func main() {
+	var alertThreshold = flag.Int("threshold", 1000, "Alert threshold")
+	flag.Parse()
+
 	reader := bufio.NewReader(os.Stdin)
-	monitor := NewMonitor(1000, -2*time.Minute)
+	monitor := NewMonitor(*alertThreshold, -2*time.Minute)
 
 	clearScreen()
 	fmt.Println("stats incoming....")
