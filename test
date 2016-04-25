@@ -1,0 +1,35 @@
+#!/bin/bash
+if [ ! -f pump/pump ]; then
+  echo 'Generating pump'
+  (cd pump && go build)
+fi
+
+if [ ! -f consumer/consumer ]; then
+  echo 'Generating consumer'
+  (cd consumer && go get && go build)
+fi
+
+function killbg() {
+  echo "CTRL-C"
+  pids=`jobs -p`
+  for pid in $pids; do
+    echo "Killing $pid"
+    kill -0 $pid 2>/dev/null
+    [ $? -eq 0 ] && kill $pid
+  done
+
+  exit
+}
+trap killbg INT
+
+(echo Running tests && cd consumer && go test)
+
+echo 'Starting Pump / Consumer (press enter to continue)'
+read
+
+tail -f /tmp/ddog | consumer/consumer &
+while true; do
+  pump/pump -wait=100 -run=1m >> /tmp/ddog
+  pump/pump -wait=1000 -run=1m >> /tmp/ddog
+done
+killbg
